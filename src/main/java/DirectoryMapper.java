@@ -22,7 +22,6 @@ public class DirectoryMapper
         String [] patterns = {".*([0-9]{2})","\"(.*)\"","\"(.*)\""};
         String [] replacements = {"$1","$1","$1"};
         try {
-//            partitionOutput = new DirectoryTreeOutputs<LongWritable, Text>(context,cn,patterns,replacements);
             partitionOutput = new DirectoryTreeOutputs(context,cn,patterns,replacements);
         }
         catch (InvalidPatternsException e) {
