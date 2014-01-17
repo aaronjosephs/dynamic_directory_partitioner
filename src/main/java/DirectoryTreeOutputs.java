@@ -1,54 +1,54 @@
+/**
+ * Created by ajosephs on 1/17/14.
+ */
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.TaskInputOutputContext;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
 public class DirectoryTreeOutputs<KEY,VALUE> extends MultipleOutputs<KEY,VALUE> {
-	
-	private static int [] directoryColumnNumbers;
+
+    private static int [] directoryColumnNumbers;
     private static String [] directoryColumnPatterns;
     private static String [] directoryColumnReplacements;
-	private static String DELIMITER;
+    private static String DELIMITER;
+
+
 	/*
 	 * default delimiter is ','
 	 */
 
-    static class InvalidPatternsException extends Exception {
-        public InvalidPatternsException (String message) {
-            super(message);
-        }
-    }
-    /*
-    In some cases the regular expressions given will not be valid to use
-     */
 
-	public DirectoryTreeOutputs(Context context, int [] dcn)
-    throws InvalidPatternsException {
+    public DirectoryTreeOutputs(Context context, int [] dcn)
+            throws InvalidPatternsException {
         this (context, dcn,null,null,",");
-	}
+    }
 
     public DirectoryTreeOutputs(Context context, int [] dcn, String [] dcp, String [] dcr)
-    throws InvalidPatternsException{
+            throws InvalidPatternsException{
         this (context,dcn,dcp,dcr,",");
     }
 
-	public DirectoryTreeOutputs(Context context, int [] dcn, String [] dcp, String [] dcr, String dlm)
-    throws InvalidPatternsException{
-		super(context);
-		directoryColumnNumbers = dcn;
+    public DirectoryTreeOutputs(Context context, int [] dcn, String [] dcp, String [] dcr, String dlm)
+            throws InvalidPatternsException{
+        super((TaskInputOutputContext<?,?,KEY,VALUE>) context);
+        directoryColumnNumbers = dcn;
         directoryColumnPatterns = dcp;
         directoryColumnReplacements = dcr;
-		DELIMITER = dlm;
+        DELIMITER = dlm;
         if (directoryColumnPatterns != null) {
             if (directoryColumnPatterns.length != directoryColumnNumbers.length || directoryColumnReplacements.length != directoryColumnNumbers.length) {
                 throw new InvalidPatternsException("Array sizes don't match");
             }
         }
-	}
-	
+    }
+
     public static String rowToDirectory (String s) {
         if (directoryColumnPatterns == null || directoryColumnReplacements == null) {
             return rowToDirectoryWithIndicies(s);
@@ -89,7 +89,7 @@ public class DirectoryTreeOutputs<KEY,VALUE> extends MultipleOutputs<KEY,VALUE> 
                 directoryName.append("EMPTY");
             }
             else if (pattern == null || replacement == null) {
-            //no transformation will be done on this columns name use the normal approach
+                //no transformation will be done on this columns name use the normal approach
                 directoryName.append(column);
             }
             else {
@@ -115,7 +115,7 @@ public class DirectoryTreeOutputs<KEY,VALUE> extends MultipleOutputs<KEY,VALUE> 
     }
 
     public void write (KEY key, VALUE value) throws IOException, InterruptedException {
-    	super.write(key,value,rowToDirectory(value.toString()));
+        super.write(key,value,rowToDirectory(value.toString()));
     }
 
     public void writeWithName (String namedOutput, KEY key, VALUE value) throws IOException, InterruptedException {

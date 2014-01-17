@@ -1,3 +1,6 @@
+/**
+ * Created by ajosephs on 1/17/14.
+ */
 // cc MaxTemperatureMapper Mapper for maximum temperature example
 // vv MaxTemperatureMapper
 import java.io.IOException;
@@ -7,7 +10,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class MaxTemperatureMapper
+public class DirectoryMapper
         extends Mapper<LongWritable, Text, LongWritable, Text> {
 
     private DirectoryTreeOutputs<LongWritable,Text> partitionOutput;
@@ -19,15 +22,15 @@ public class MaxTemperatureMapper
         String [] patterns = {".*([0-9]{2})","\"(.*)\"","\"(.*)\""};
         String [] replacements = {"$1","$1","$1"};
         try {
+//            partitionOutput = new DirectoryTreeOutputs<LongWritable, Text>(context,cn,patterns,replacements);
             partitionOutput = new DirectoryTreeOutputs<LongWritable, Text>(context,cn,patterns,replacements);
         }
-        catch (DirectoryTreeOutputs.InvalidPatternsException e) {
+        catch (InvalidPatternsException e) {
 
         }
     }
     @Override
-    protected void cleanup(Context context)
-            throws IOException, InterruptedException {
+    protected void cleanup(Context context) throws IOException, InterruptedException {
         partitionOutput.close();
     }
 
